@@ -1,16 +1,17 @@
 import requests
 from bs4 import BeautifulSoup
-from models.articulo import Articulo, Propiedad
+from ..models.articulo import Articulo, Propiedad
+from ..utilidades import demorarConsulta
 
 class Alkosto:
     urlBase = "https://www.alkosto.com/salesperson/result/"
     
-    def consultarArticulo(self, nombreArticulo):
+    def consultarArticulos(self, nombreArticulo):
+        articulosObj = []
         params = { 'q': nombreArticulo }
         rq = requests.get(self.urlBase, params = params )
-        correcto = rq.status_code == 200
 
-        if correcto:
+        if rq.status_code == 200:
             soup = BeautifulSoup(rq.text, 'html.parser')
             # articulosTags = soup.select('ul.products-grid > li')
             articulosTags = soup.select('ul.products-grid > li')[:3]
@@ -21,7 +22,7 @@ class Alkosto:
                 nuevoArticulo.url = articuloTag.h2.a['href']
                 nuevoArticulo.precio = float(articuloTag.select_one('span.price').text.strip()[2:].replace(".", ""))
 
-                precioAntesTag = articulo.select_one('span.price-old')
+                precioAntesTag = articuloTag.select_one('span.price-old')
 
                 nuevoArticulo.tieneDescuento = precioAntesTag != None
 
@@ -29,6 +30,8 @@ class Alkosto:
                     precioAntes = float(precioAntesTag.text.strip()[2:].replace(".", ""))
                     diferencia = precioAntes - nuevoArticulo.precio
                     nuevoArticulo.descuento = diferencia / precioAntes
+
+                demorarConsulta()
 
                 rq2 = requests.get(nuevoArticulo.url)
 
@@ -42,8 +45,8 @@ class Alkosto:
                         nuevaPropiedad.descripcion = propiedadTag.find(class_="data").text
 
                         nuevoArticulo.propiedades.append(nuevaPropiedad)
-                
-            # TODO: Guardar articulo en la BD
 
-            print(nuevoArticulo)
-        return correcto
+                articulosObj.append(nuevoArticulo)
+
+            # TODO: Guardar articulo en la BD
+        return articulosObj
