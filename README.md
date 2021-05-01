@@ -3,24 +3,10 @@ Aplicaciòn python para realizar web scrapping como parte del prototipo a realiz
 
 Versión de Python: 3.9.3
 
-## Modulos instalar
-
-pyodbc
+Una vez clonado el proyecto realizar
 
 ```bash
-pip install pyodbc
-```
-
-Beautiful Soup
-
-```bash
-pip install beautifulsoup4
-```
-
-requests
-
-```bash
-python -m pip install requests
+pip install -r requirements.txt
 ```
 
 ## Comandos útiles

@@ -2,19 +2,18 @@ import requests
 from bs4 import BeautifulSoup
 from ..models.articulo import Articulo, Propiedad
 from ..utilidades import demorarConsulta
+from ..BestockDbContext import insertarArticulo
 
 class Alkosto:
     urlBase = "https://www.alkosto.com/salesperson/result/"
     
     def consultarArticulos(self, nombreArticulo):
-        articulosObj = []
         params = { 'q': nombreArticulo }
         rq = requests.get(self.urlBase, params = params )
 
         if rq.status_code == 200:
             soup = BeautifulSoup(rq.text, 'html.parser')
-            # articulosTags = soup.select('ul.products-grid > li')
-            articulosTags = soup.select('ul.products-grid > li')[:3]
+            articulosTags = soup.select('ul.products-grid > li')
 
             for articuloTag in articulosTags:
                 nuevoArticulo = Articulo()
@@ -46,7 +45,4 @@ class Alkosto:
 
                         nuevoArticulo.propiedades.append(nuevaPropiedad)
 
-                articulosObj.append(nuevoArticulo)
-
-            # TODO: Guardar articulo en la BD
-        return articulosObj
+                insertarArticulo(nuevoArticulo)

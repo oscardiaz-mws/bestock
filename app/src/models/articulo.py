@@ -7,5 +7,5 @@ class Articulo:
     descuento = 0
 
 class Propiedad:
-    nombre = ''
+    nombre = 'Otro'
     descripcion = ''
